@@ -21,6 +21,7 @@ SUBSYSTEM_DEF(timer)
 	wait = 1 //SS_TICKER subsystem, so wait is in ticks
 	priority = SS_PRIORITY_TIMER
 	flags = SS_NO_INIT | SS_TICKER
+	runlevels = RUNLEVELS_DEFAULT | RUNLEVEL_LOBBY
 
 	/// Queue used for storing timers that do not fit into the current buckets
 	var/list/datum/timedevent/second_queue = list()
@@ -557,7 +558,7 @@ SUBSYSTEM_DEF(timer)
 		PRINT_STACK_TRACE("addtimer called with a callback assigned to a qdeleted object. In the future such timers will not \
 			be supported and may refuse to run or run with a 0 wait")
 
-	wait = max(CEILING(wait, world.tick_lag), world.tick_lag)
+	wait = max(NONUNIT_CEILING(wait, world.tick_lag), world.tick_lag)
 
 	if(wait >= INFINITY)
 		CRASH("Attempted to create timer with INFINITY delay")

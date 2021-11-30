@@ -101,6 +101,9 @@
 	req_amount = 5
 	time = 25
 
+/datum/stack_recipe/furniture/computerframe/spawn_result(mob/user, location, amount)
+	return new result_type(location)
+
 /datum/stack_recipe/furniture/ladder
 	title = "ladder"
 	result_type = /obj/structure/ladder
@@ -124,11 +127,17 @@
 	req_amount = 5
 	time = 25
 
+/datum/stack_recipe/furniture/machine/spawn_result(mob/user, location, amount)
+	return new result_type(location)
+
 /datum/stack_recipe/furniture/turret
 	title = "turret frame"
 	result_type = /obj/machinery/porta_turret_construct
 	req_amount = 5
 	time = 25
+
+/datum/stack_recipe/furniture/turret/spawn_result(mob/user, location, amount)
+	return new result_type(location)
 
 /datum/stack_recipe/furniture/door_assembly
 	time = 50
@@ -150,8 +159,14 @@
 	result_type = /obj/structure/door_assembly/door_assembly_ext
 
 /datum/stack_recipe/furniture/door_assembly/firedoor
-	title = "emergency shutter"
+	title = "emergency shutter assembly"
 	result_type = /obj/structure/firedoor_assembly
+
+/datum/stack_recipe/furniture/door_assembly/firedoor/border
+	title = "unidirectional emergency shutter assembly"
+	result_type = /obj/structure/firedoor_assembly/border
+	one_per_turf = FALSE
+	time = 10
 
 /datum/stack_recipe/furniture/door_assembly/double
 	title = "double airlock assembly"
@@ -203,6 +218,9 @@
 	req_amount = 3
 	time = 10
 
+/datum/stack_recipe/furniture/planting_bed/spawn_result(mob/user, location, amount)
+	return new result_type(location)
+
 /datum/stack_recipe/furniture/fullwindow
 	title = "full-tile window"
 	result_type = /obj/structure/window
@@ -218,7 +236,7 @@
 				return FALSE
 
 /datum/stack_recipe/furniture/fullwindow/spawn_result(mob/user, location, amount)
-	return new result_type(user?.loc, SOUTHWEST, 1, use_material, use_reinf_material)
+	return new result_type(user?.loc, use_material, use_reinf_material, SOUTHWEST, TRUE)
 
 /datum/stack_recipe/furniture/borderwindow
 	title = "border window"
@@ -235,7 +253,7 @@
 				return FALSE
 
 /datum/stack_recipe/furniture/borderwindow/spawn_result(mob/user, location, amount)
-	return new result_type(user?.loc, user?.dir, 1, use_material, use_reinf_material)
+	return new result_type(user?.loc, use_material, use_reinf_material, user?.dir, TRUE)
 
 /datum/stack_recipe/furniture/windoor
 	title = "windoor assembly"

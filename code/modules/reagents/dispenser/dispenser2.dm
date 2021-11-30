@@ -27,6 +27,11 @@
 	core_skill = SKILL_CHEMISTRY
 	var/can_contaminate = TRUE
 	var/buildable = TRUE
+	var/static/list/acceptable_containers = list(
+		/obj/item/chems/glass,
+		/obj/item/chems/condiment,
+		/obj/item/chems/drinks		
+	)
 
 /obj/machinery/chemical_dispenser/Initialize(mapload, d=0, populate_parts = TRUE)
 	. = ..()
@@ -91,14 +96,14 @@
 			C.dropInto(loc)
 			return TRUE
 
-	if(istype(W, /obj/item/chems/glass) || istype(W, /obj/item/chems/food))
+	if(is_type_in_list(W, acceptable_containers))
 		if(container)
 			to_chat(user, "<span class='warning'>There is already \a [container] on \the [src]!</span>")
 			return TRUE
 
 		var/obj/item/chems/RC = W
 
-		if(!accept_drinking && istype(RC,/obj/item/chems/food))
+		if(!accept_drinking && (istype(RC,/obj/item/chems/condiment) || istype(RC,/obj/item/chems/drinks)))
 			to_chat(user, "<span class='warning'>This machine only accepts beakers!</span>")
 			return TRUE
 

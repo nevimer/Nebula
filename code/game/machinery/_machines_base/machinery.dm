@@ -82,6 +82,9 @@ Class Procs:
 	layer = STRUCTURE_LAYER // Layer under items
 	throw_speed = 1
 	throw_range = 5
+	matter = list(
+		/decl/material/solid/metal/steel = MATTER_AMOUNT_PRIMARY
+	)
 
 	var/stat = 0
 	var/waterproof = TRUE
@@ -276,14 +279,6 @@ Class Procs:
 		return FALSE // The interactions below all assume physical access to the machine. If this is not the case, we let the machine take further action.
 	if(!user.check_dexterity(required_interaction_dexterity))
 		return TRUE
-	if(ishuman(user))
-		var/mob/living/carbon/human/H = user
-		if(H.getBrainLoss() >= 55)
-			visible_message("<span class='warning'>[H] stares cluelessly at \the [src].</span>")
-			return 1
-		else if(prob(H.getBrainLoss()))
-			to_chat(user, "<span class='warning'>You momentarily forget how to use \the [src].</span>")
-			return 1
 	if((. = component_attack_hand(user)))
 		return
 	if(wires && (. = wires.Interact(user)))
@@ -428,8 +423,11 @@ Class Procs:
 		explosion_act(3)
 
 /obj/machinery/Move()
+	var/atom/lastloc = loc
 	. = ..()
 	if(. && !CanFluidPass())
+		if(lastloc)
+			lastloc.fluid_update()
 		fluid_update()
 
 /obj/machinery/get_cell(var/functional_only = TRUE)
@@ -461,8 +459,11 @@ Class Procs:
 
 /obj/machinery/get_contained_external_atoms()
 	. = ..()
-	. -= component_parts
+	LAZYREMOVE(., component_parts)
 
 /obj/machinery/proc/get_auto_access()
 	var/area/A = get_area(src)
 	return A?.req_access?.Copy()
+
+/obj/machinery/get_matter_amount_modifier()
+	. = ..() * HOLLOW_OBJECT_MATTER_MULTIPLIER // machine matter is largely just the frame, and the components contribute most of the matter/value.

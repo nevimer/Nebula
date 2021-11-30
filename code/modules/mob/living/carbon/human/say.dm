@@ -90,8 +90,8 @@
 
 	if(voice_sub)
 		return voice_sub
-	if(mind && mind.changeling && mind.changeling.mimicing)
-		return mind.changeling.mimicing
+	if(mind && mind.changeling && mind.changeling.mimicking)
+		return mind.changeling.mimicking
 	return real_name
 
 /mob/living/carbon/human/say_quote(var/message, var/decl/language/speaking = null)
@@ -110,6 +110,7 @@
 
 /mob/living/carbon/human/handle_speech_problems(var/list/message_data)
 	if(HAS_STATUS(src, STAT_SILENCE) || (sdisabilities & MUTED))
+		to_chat(src, SPAN_WARNING("You are unable to speak!"))
 		message_data[1] = ""
 		. = 1
 
@@ -127,10 +128,11 @@
 	switch(message_mode)
 		if("intercom")
 			if(!src.restrained())
-				for(var/obj/item/radio/intercom/I in view(1))
-					I.talk_into(src, message, null, verb, speaking)
-					I.add_fingerprint(src)
-					used_radios += I
+				for(var/obj/item/radio/I in view(1))
+					if(I.intercom_handling)
+						I.talk_into(src, message, null, verb, speaking)
+						I.add_fingerprint(src)
+						used_radios += I
 		if("headset")
 			if(l_ear && istype(l_ear,/obj/item/radio))
 				var/obj/item/radio/R = l_ear

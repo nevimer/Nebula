@@ -117,16 +117,17 @@
 /obj/machinery/light/on_update_icon(var/trigger = 1)
 	atom_flags = atom_flags & ~ATOM_FLAG_CAN_BE_PAINTED
 	// Handle pixel offsets
-	pixel_y = 0
-	pixel_x = 0
+	default_pixel_y = 0
+	default_pixel_x = 0
 	var/turf/T = get_step(get_turf(src), src.dir)
 	if(istype(T) && T.density)
 		if(src.dir == NORTH)
-			pixel_y = 21
+			default_pixel_y = 21
 		else if(src.dir == EAST)
-			pixel_x = 10
+			default_pixel_x = 10
 		else if(src.dir == WEST)
-			pixel_x = -10
+			default_pixel_x = -10
+	reset_offsets(0)
 
 	// Update icon state
 	cut_overlays()
@@ -365,7 +366,7 @@
 				user.apply_damage(3, BURN, hand.organ_tag, used_weapon = src)
 				var/decl/pronouns/G = user.get_pronouns()
 				user.visible_message( \
-					SPAN_DANGER("\The [user]'s [hand.name] burns and sizzles as [G.he] touches the hot [get_fitting_name()]."), \
+					SPAN_DANGER("\The [user]'s [hand.name] burns and sizzles as [G.he] touch[G.es] the hot [get_fitting_name()]."), \
 					SPAN_DANGER("Your [hand.name] burns and sizzles as you remove the hot [get_fitting_name()]."))
 		else
 			to_chat(user, SPAN_WARNING("You try to remove the [get_fitting_name()], but it's too hot and you don't want to burn your hand."))
@@ -494,6 +495,7 @@
 	w_class = ITEM_SIZE_TINY
 	material = /decl/material/solid/metal/steel
 	atom_flags = ATOM_FLAG_NO_TEMP_CHANGE | ATOM_FLAG_CAN_BE_PAINTED
+	item_flags = ITEM_FLAG_HOLLOW
 
 	var/status = 0		// LIGHT_OK, LIGHT_BURNED or LIGHT_BROKEN
 	var/base_state
@@ -501,7 +503,7 @@
 	var/rigged = 0		// true if rigged to explode
 	var/broken_chance = 2
 
-	var/b_power = 0.9
+	var/b_power = 0.7
 	var/b_range = 5
 	var/b_color = LIGHT_COLOR_HALOGEN
 	var/list/lighting_modes = list()
@@ -523,7 +525,8 @@
 	material = /decl/material/solid/glass
 	matter = list(/decl/material/solid/metal/aluminium = MATTER_AMOUNT_REINFORCEMENT)
 
-	b_range = 5
+	b_range = 8
+	b_power = 0.8
 	b_color = LIGHT_COLOR_HALOGEN
 	lighting_modes = list(
 		LIGHTMODE_EMERGENCY = list(l_range = 4, l_power = 1, l_color = LIGHT_COLOR_EMERGENCY),
@@ -537,8 +540,8 @@
 /obj/item/light/tube/large
 	w_class = ITEM_SIZE_SMALL
 	name = "large light tube"
-	b_power = 0.95
-	b_range = 8
+	b_power = 4
+	b_range = 12
 
 /obj/item/light/tube/large/party/Initialize() //Randomly colored light tubes. Mostly for testing, but maybe someone will find a use for them.
 	. = ..()
@@ -552,9 +555,6 @@
 	item_state = "contvapour"
 	broken_chance = 3
 	material = /decl/material/solid/glass
-
-	b_power = 0.6
-	b_range = 4
 	b_color = LIGHT_COLOR_TUNGSTEN
 	lighting_modes = list(
 		LIGHTMODE_EMERGENCY = list(l_range = 3, l_power = 1, l_color = LIGHT_COLOR_EMERGENCY),

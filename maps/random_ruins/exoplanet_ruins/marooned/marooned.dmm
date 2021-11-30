@@ -263,7 +263,7 @@
 /turf/simulated/floor/tiled/steel_ridged,
 /area/map_template/marooned)
 "aP" = (
-/obj/structure/fuel_port,
+/obj/structure/fuel_port/hydrogen,
 /obj/effect/paint/black,
 /turf/simulated/wall/ocp_wall,
 /area/map_template/marooned)
@@ -321,7 +321,6 @@
 	icon_state = "0-6"
 	},
 /obj/structure/cable{
-	d2 = 4;
 	icon_state = "0-4"
 	},
 /obj/effect/landmark/scorcher,
@@ -330,8 +329,6 @@
 /area/template_noop)
 "aX" = (
 /obj/structure/cable{
-	d1 = 4;
-	d2 = 8;
 	icon_state = "4-8"
 	},
 /obj/effect/landmark/scorcher,
@@ -346,7 +343,6 @@
 	pixel_y = 3
 	},
 /obj/structure/cable{
-	d2 = 8;
 	icon_state = "0-8"
 	},
 /obj/effect/landmark/scorcher,

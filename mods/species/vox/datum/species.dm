@@ -90,6 +90,8 @@
 		BP_HINDTONGUE = /obj/item/organ/internal/hindtongue
 		)
 
+	override_limb_types = list(BP_TAIL = /obj/item/organ/external/tail/vox)
+
 	available_pronouns = list(/decl/pronouns/neuter)
 	available_bodytypes = list(/decl/bodytype/vox)
 
@@ -137,7 +139,6 @@
 
 /decl/species/vox/equip_survival_gear(var/mob/living/carbon/human/H)
 	H.equip_to_slot_or_del(new /obj/item/clothing/mask/gas/vox(H), slot_wear_mask_str)
-
 	if(istype(H.get_equipped_item(slot_back_str), /obj/item/storage/backpack))
 		H.equip_to_slot_or_del(new /obj/item/storage/box/vox(H.back), slot_in_backpack_str)
 		var/obj/item/tank/nitrogen/tank = new(H)
@@ -151,7 +152,7 @@
 
 /decl/species/vox/disfigure_msg(var/mob/living/carbon/human/H)
 	var/decl/pronouns/G = H.get_pronouns()
-	return "<span class='danger'>[G.His] beak-segments are cracked and chipped! [G.He] [G.is] not even recognizable.</span>\n"
+	return SPAN_DANGER("[G.His] beak-segments are cracked and chipped! [G.He] [G.is] not even recognizable.\n")
 	
 /decl/species/vox/skills_from_age(age)
 	. = 8

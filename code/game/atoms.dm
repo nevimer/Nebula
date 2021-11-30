@@ -19,66 +19,10 @@
 	var/icon_rotation = 0 // And one for rotation as well.
 	var/transform_animate_time = 0 // If greater than zero, transform-based adjustments (scaling, rotating) will visually occur over this time.
 
-/atom/New(loc, ...)
-	//atom creation method that preloads variables at creation
-	if(global.use_preloader && (src.type == global._preloader.target_path))//in case the instanciated atom is creating other atoms in New()
-		global._preloader.load(src)
-
-	var/do_initialize = SSatoms.atom_init_stage
-	var/list/created = SSatoms.created_atoms
-	if(do_initialize > INITIALIZATION_INSSATOMS_LATE)
-		args[1] = do_initialize == INITIALIZATION_INNEW_MAPLOAD
-		if(SSatoms.InitAtom(src, args))
-			//we were deleted
-			return
-	else if(created)
-		var/list/argument_list
-		if(length(args) > 1)
-			argument_list = args.Copy(2)
-		if(argument_list || do_initialize == INITIALIZATION_INSSATOMS_LATE)
-			created[src] = argument_list
-
-	if(atom_flags & ATOM_FLAG_CLIMBABLE)
-		verbs += /atom/proc/climb_on
-
-//Called after New if the map is being loaded. mapload = TRUE
-//Called from base of New if the map is not being loaded. mapload = FALSE
-//This base must be called or derivatives must set initialized to TRUE
-//must not sleep
-//Other parameters are passed from New (excluding loc)
-//Must return an Initialize hint. Defined in __DEFINES/subsystems.dm
-
-/atom/proc/Initialize(mapload, ...)
-	SHOULD_CALL_PARENT(TRUE)
-	SHOULD_NOT_SLEEP(TRUE)
-	if(atom_flags & ATOM_FLAG_INITIALIZED)
-		PRINT_STACK_TRACE("Warning: [src]([type]) initialized multiple times!")
-	atom_flags |= ATOM_FLAG_INITIALIZED
-
-	if(light_power && light_range)
-		update_light()
-
-	if(opacity)
-		updateVisibility(src)
-		var/turf/T = loc
-		if(istype(T))
-			T.recalc_atom_opacity()
-
-	return INITIALIZE_HINT_NORMAL
-
-//called if Initialize returns INITIALIZE_HINT_LATELOAD
-/atom/proc/LateInitialize()
-	return
-
-/atom/Destroy()
-	overlays.Cut()
-	underlays.Cut()
-	global.is_currently_exploding -= src
-	QDEL_NULL(reagents)
-	QDEL_NULL(light)
-	if(opacity)
-		updateVisibility(src)
-	. = ..()
+	var/tmp/currently_exploding = FALSE
+	var/tmp/default_pixel_x
+	var/tmp/default_pixel_y
+	var/tmp/default_pixel_z
 
 // This is called by the maploader prior to Initialize to perform static modifications to vars set on the map. Intended use case: adjust tag vars on duplicate templates.
 /atom/proc/modify_mapped_vars(map_hash)
@@ -336,14 +280,14 @@ its easier to just keep the beam vertical.
 
 /atom/proc/explosion_act(var/severity)
 	SHOULD_CALL_PARENT(TRUE)
-	if(!global.is_currently_exploding[src])
-		global.is_currently_exploding[src] = TRUE
+	if(!currently_exploding)
+		currently_exploding = TRUE
 		. = (severity <= 3)
 		if(.)
 			for(var/atom/movable/AM in contents)
 				AM.explosion_act(severity++)
 			try_detonate_reagents(severity)
-		global.is_currently_exploding -= src
+		currently_exploding = FALSE
 
 /atom/proc/emag_act(var/remaining_charges, var/mob/user, var/emag_source)
 	return NO_EMAG_ACT
@@ -475,14 +419,6 @@ its easier to just keep the beam vertical.
 
 /atom/movable/onDropInto(var/atom/movable/AM)
 	return loc // If onDropInto returns something, then dropInto will attempt to drop AM there.
-
-//all things climbable
-/atom/attack_hand(mob/user)
-	..()
-	if(LAZYLEN(climbers) && !(user in climbers))
-		user.visible_message("<span class='warning'>[user.name] shakes \the [src].</span>", \
-					"<span class='notice'>You shake \the [src].</span>")
-		object_shaken()
 
 // Called when hitting the atom with a grab.
 // Will skip attackby() and afterattack() if returning TRUE.
@@ -645,3 +581,11 @@ its easier to just keep the beam vertical.
 	M.Scale(icon_scale_x, icon_scale_y)
 	M.Turn(icon_rotation)
 	animate(src, transform = M, transform_animate_time)
+
+// Walks up the loc tree until it finds a loc of the given loc_type
+/atom/get_recursive_loc_of_type(var/loc_type)
+	var/atom/check_loc = loc
+	while(check_loc)
+		if(istype(check_loc, loc_type))
+			return check_loc
+		check_loc = check_loc.loc

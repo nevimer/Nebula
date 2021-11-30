@@ -79,8 +79,6 @@
 
 		handle_stamina()
 
-		handle_medical_side_effects()
-
 	if(!handle_some_updates())
 		return											//We go ahead and process them 5 times for HUD images and other stuff though.
 
@@ -261,7 +259,7 @@
 			damage = 8
 			radiation -= 4 * RADIATION_SPEED_COEFFICIENT
 
-		damage = Floor(damage * species.get_radiation_mod(src))
+		damage = FLOOR(damage * species.get_radiation_mod(src))
 		if(damage)
 			adjustToxLoss(damage * RADIATION_SPEED_COEFFICIENT)
 			immunity = max(0, immunity - damage * 15 * RADIATION_SPEED_COEFFICIENT)
@@ -312,6 +310,9 @@
 	return !failed_last_breath
 
 /mob/living/carbon/human/handle_environment(datum/gas_mixture/environment)
+
+	..()
+
 	if(!environment || (MUTATION_SPACERES in mutations))
 		return
 
@@ -519,12 +520,11 @@
 			. += THERMAL_PROTECTION_HAND_RIGHT
 	return min(1,.)
 
-/mob/living/carbon/human/handle_chemicals_in_body()
+/mob/living/carbon/human/apply_chemical_effects()
 	. = ..()
-	if(.)
-		if(has_chemical_effect(CE_GLOWINGEYES, 1))
-			update_eyes()
-		updatehealth()
+	if(has_chemical_effect(CE_GLOWINGEYES, 1))
+		update_eyes()
+		return TRUE
 
 // Check if we should die.
 /mob/living/carbon/human/proc/handle_death_check()
@@ -569,7 +569,7 @@
 			adjustHalLoss(-3)
 
 			if(prob(2) && is_asystole() && isSynthetic())
-				visible_message("<b>[src]</b> [pick("emits low pitched whirr","beeps urgently")]")
+				visible_message("<b>[src]</b> [pick("emits low pitched whirr","beeps urgently")].")
 		//CONSCIOUS
 		else
 			set_stat(CONSCIOUS)
@@ -745,7 +745,7 @@
 		if(isSynthetic())
 			var/obj/item/organ/internal/cell/C = get_internal_organ(BP_CELL)
 			if (istype(C))
-				var/chargeNum = Clamp(ceil(C.percent()/25), 0, 4)	//0-100 maps to 0-4, but give it a paranoid clamp just in case.
+				var/chargeNum = Clamp(CEILING(C.percent()/25), 0, 4)	//0-100 maps to 0-4, but give it a paranoid clamp just in case.
 				cells.icon_state = "charge[chargeNum]"
 			else
 				cells.icon_state = "charge-empty"

@@ -65,7 +65,7 @@
 	var/sheet_name = istype(sheet, /obj/item/photo) ? "photo" : "sheet of paper"
 	bundle_name = (bundle_name == name) ? "the [bundle_name]" : name
 	sheet_name = (sheet_name == sheet.name) ? "the [sheet_name]" : sheet.name
-	
+
 	to_chat(user, "<span class='notice'>You add [sheet_name] to [bundle_name].</span>")
 	pages.Insert(index, sheet)
 	if(index <= page)
@@ -89,7 +89,7 @@
 	var/span_class = istype(P, /obj/item/flame/lighter/zippo) ? "rose" : "warning"
 	var/decl/pronouns/G = user.get_pronouns()
 	user.visible_message( \
-		"<span class='[span_class]'>\The [user] holds \the [P] up to \the [src]. It looks like [G.he]'s trying to burn it!</span>", \
+		"<span class='[span_class]'>\The [user] holds \the [P] up to \the [src]. It looks like [G.he] [G.is] trying to burn it!</span>", \
 		"<span class='[span_class]'>You hold \the [P] up to \the [src], burning it slowly.</span>")
 	addtimer(CALLBACK(src, .proc/burn_callback, P, user, span_class), 2 SECONDS)
 
@@ -218,8 +218,9 @@
 			img.icon_state = O.icon_state
 			img.pixel_x -= min(1*i, 2)
 			img.pixel_y -= min(1*i, 2)
-			pixel_x = min(0.5*i, 1)
-			pixel_y = min(  1*i, 2)
+			default_pixel_x = min(0.5*i, 1)
+			default_pixel_y = min(  1*i, 2)
+			reset_offsets(0)
 			underlays += img
 			i++
 		else if(istype(O, /obj/item/photo))

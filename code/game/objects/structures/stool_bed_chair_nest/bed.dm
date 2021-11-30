@@ -21,6 +21,11 @@
 	material = DEFAULT_FURNITURE_MATERIAL
 	material_alteration = MAT_FLAG_ALTERATION_ALL
 	tool_interaction_flags = TOOL_INTERACTION_DECONSTRUCT
+	parts_amount = 2
+	parts_type = /obj/item/stack/material/strut
+
+/obj/structure/bed/get_base_value()
+	. = round(..() * 2.5) // Utility structures should be worth more than their matter (wheelchairs, rollers, etc).
 
 /obj/structure/bed/update_material_name()
 	if(reinf_material)
@@ -104,20 +109,6 @@
 					if(user_buckle_mob(affecting, user))
 						qdel(W)
 
-/obj/structure/bed/Move()
-	. = ..()
-	if(buckled_mob)
-		buckled_mob.glide_size = glide_size // Setting loc apparently does animate with glide size.
-		buckled_mob.forceMove(loc)
-
-/obj/structure/bed/forceMove()
-	. = ..()
-	if(buckled_mob)
-		if(isturf(src.loc))
-			buckled_mob.forceMove(src.loc)
-		else
-			unbuckle_mob()
-
 /obj/structure/bed/proc/remove_padding()
 	if(reinf_material)
 		reinf_material.create_object(get_turf(src))
@@ -149,7 +140,8 @@
 	icon = 'icons/obj/structures/rollerbed.dmi'
 	icon_state = "down"
 	anchored = 0
-	buckle_pixel_shift = @"{'x':0,'y':0,'z':6}"
+	buckle_pixel_shift = list("x" = 0, "y" = 0, "z" = 6)
+	movable_flags = MOVABLE_FLAG_WHEELED
 	var/item_form_type = /obj/item/roller	//The folded-up object path.
 	var/obj/item/chems/beaker
 	var/iv_attached = 0
@@ -270,6 +262,9 @@
 	w_class = ITEM_SIZE_LARGE
 	pickup_sound = 'sound/foley/pickup2.ogg'
 	var/structure_form_type = /obj/structure/bed/roller	//The deployed form path.
+
+/obj/item/roller/get_single_monetary_worth()
+	. = structure_form_type ? atom_info_repository.get_combined_worth_for(structure_form_type) : ..()
 
 /obj/item/roller/attack_self(mob/user)
 	var/obj/structure/bed/roller/R = new structure_form_type(user.loc)

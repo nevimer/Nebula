@@ -81,16 +81,6 @@
 		visible_message(SPAN_DANGER("\The [M] bursts out of \the [src]!"))
 	..()
 
-/mob/living/carbon/attack_hand(mob/user)
-	var/obj/item/organ/external/temp = user.get_organ(user.get_active_held_item_slot())
-	if(!temp)
-		to_chat(user, SPAN_WARNING("You don't have a usable limb!"))
-		return TRUE
-	if(!temp.is_usable())
-		to_chat(user, SPAN_WARNING("You can't use your [temp.name]."))
-		return TRUE
-	. = ..()
-
 /mob/living/carbon/electrocute_act(var/shock_damage, var/obj/source, var/siemens_coeff = 1.0, var/def_zone = null)
 	if(status_flags & GODMODE)	return 0	//godmode
 
@@ -414,9 +404,6 @@
 	for(var/source in stasis_sources)
 		stasis_value += stasis_sources[source]
 	stasis_sources.Cut()
-
-/mob/living/carbon/get_sex()
-	return species.get_sex(src)
 
 /mob/living/carbon/proc/set_nutrition(var/amt)
 	nutrition = Clamp(amt, 0, initial(nutrition))

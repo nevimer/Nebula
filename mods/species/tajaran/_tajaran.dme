@@ -9,3 +9,19 @@
 #include "datum/species.dm"
 #include "datum/species_bodytypes.dm"
 #endif
+// BEGIN_INTERNALS
+// END_INTERNALS
+// BEGIN_FILE_DIR
+#define FILE_DIR .
+// END_FILE_DIR
+// BEGIN_PREFERENCES
+// END_PREFERENCES
+// BEGIN_INCLUDE
+#include "_tajaran.dm"
+#include "datum\accessory.dm"
+#include "datum\culture.dm"
+#include "datum\emotes.dm"
+#include "datum\language.dm"
+#include "datum\species.dm"
+#include "datum\species_bodytypes.dm"
+// END_INCLUDE
